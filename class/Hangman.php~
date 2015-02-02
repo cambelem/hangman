@@ -6,7 +6,7 @@
 	class Hangman 
 	{		
 		/*
-		This constructor determines the action
+		This is constructor determines the action
 		and appropriately calls the functions to
 		play a hangman game.
 		*/
