@@ -23,6 +23,7 @@
 
 <div id="main">
 	<!-- BEGIN wlgame -->{WIN_LOSS}<!-- END wlgame -->
+	<br>
 	<!-- BEGIN ngame -->{NEW_GAME}<!-- END ngame -->
 
 

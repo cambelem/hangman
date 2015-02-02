@@ -63,6 +63,11 @@
 					}	
 			}
 			
+			if (isset($_SESSION['correctletters']))
+			{
+				$cletters = $_SESSION['correctletters'];
+			}
+
 			$tpl['wlgame'] = $this->checkWinOrLoss($cletters , $_SESSION['word']);
 			$winloss = $this->winLoss($cletters , $_SESSION['word']);
 
@@ -73,7 +78,7 @@
 
 			$nglink = PHPWS_Text::moduleLink('New Game','hangman', array('action'=> 'new_game'));
 			$tpl['ngame'][]= array('NEW_GAME' => $nglink);
-
+	
 			echo PHPWS_Template::process($tpl, $GLOBALS['module'], $GLOBALS['file']);
 		}
 
@@ -256,7 +261,7 @@
 				return $winlosearray;
 			}
 			
-			if (count($correctarray) == count(str_split($word)) - 1)
+			if (count($correctarray) == count(str_split($word)))
 			{				 
 				$winlosearray[]= array('WIN_LOSS' => "You win!");
 				return $winlosearray;						
@@ -278,7 +283,7 @@
 				return 0;
 			}
 			
-			if (count($correctarray) == count(str_split($word)) - 1)
+			if (count($correctarray) == count(str_split($word)))
 			{
 				return 0;
 			}

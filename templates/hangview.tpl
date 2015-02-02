@@ -1,5 +1,5 @@
 <head>
-<link rel="stylesheet" type="text/css" href="mod/hangman/test.css">
+<link rel="stylesheet" type="text/css" href="mod/hangman/hangman.css">
 </head>
 
 <div id="navlist">

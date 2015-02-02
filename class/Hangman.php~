@@ -6,7 +6,7 @@
 	class Hangman 
 	{		
 		/*
-		This is constructor determines the action
+		This constructor determines the action
 		and appropriately calls the functions to
 		play a hangman game.
 		*/
@@ -63,6 +63,11 @@
 					}	
 			}
 			
+			if (isset($_SESSION['correctletters']))
+			{
+				$cletters = $_SESSION['correctletters'];
+			}
+
 			$tpl['wlgame'] = $this->checkWinOrLoss($cletters , $_SESSION['word']);
 			$winloss = $this->winLoss($cletters , $_SESSION['word']);
 
@@ -74,6 +79,8 @@
 			$nglink = PHPWS_Text::moduleLink('New Game','hangman', array('action'=> 'new_game'));
 			$tpl['ngame'][]= array('NEW_GAME' => $nglink);
 
+var_dump($cletters);
+	
 			echo PHPWS_Template::process($tpl, $GLOBALS['module'], $GLOBALS['file']);
 		}
 
@@ -104,7 +111,7 @@
 			{						
 				$tempArray[$i] = array('CORRECTLETTERS' => "_ ");
 			}
-
+print_r($_SESSION['word']);
 			return $tempArray;
 		}
 
@@ -256,7 +263,7 @@
 				return $winlosearray;
 			}
 			
-			if (count($correctarray) == count(str_split($word)) - 1)
+			if (count($correctarray) == count(str_split($word)))
 			{				 
 				$winlosearray[]= array('WIN_LOSS' => "You win!");
 				return $winlosearray;						
@@ -278,7 +285,7 @@
 				return 0;
 			}
 			
-			if (count($correctarray) == count(str_split($word)) - 1)
+			if (count($correctarray) == count(str_split($word)))
 			{
 				return 0;
 			}
