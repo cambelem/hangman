@@ -3,22 +3,13 @@
  * @author Eric Cambel
  */
 
-
-
+	//Create a new Hangman class
 	$hangman = new Hangman();
-	
+		
+	//Setup the view class using a Hangman object
+	$view = new HangView($hangman);
 
-//Make the object
-	
-
-//Take action (if needed)
-
-//findLetters($guess, $word);
-
-//Setup the view class (below)
-//$view = new HangmanView($hangman);
-
-//Render view
-
+	//Render view
+	Layout::add($view->display(), 'hangman');
 
 ?>

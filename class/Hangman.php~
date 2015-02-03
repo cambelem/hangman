@@ -78,8 +78,6 @@
 
 			$nglink = PHPWS_Text::moduleLink('New Game','hangman', array('action'=> 'new_game'));
 			$tpl['ngame'][]= array('NEW_GAME' => $nglink);
-
-var_dump($cletters);
 	
 			echo PHPWS_Template::process($tpl, $GLOBALS['module'], $GLOBALS['file']);
 		}
