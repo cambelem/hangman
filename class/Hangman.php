@@ -1,24 +1,26 @@
 <?php
 
-
 	class Hangman 
 	{		
-
-		private $correct;
-		private $pic;
-		private $list;
-		private $wlgame; 
-		private $hidew; 
-		private $action;
-
+		
+		private $gletter; 
+		private $word; 
+		private $cletters; 
+		private $isletter; 
+		private $count;
+		private $list; 		
+		private $wlgame; 		
+		private $action; 
+		
+		
 		/*
 		This constructor determines the action
 		and appropriately calls the functions to
-		play a hangman game.
+		store info to play a hangman game.
 		*/
 		public function __construct()
 		{
-			$list = array();
+			$this->list = array();
 			$this->hidew = false;
 
 			if (!isset($_GET['action']))
@@ -27,64 +29,57 @@
 			}
 
 			$this->action = $_GET['action'];	
-			$cletters = array();
+			$this->cletters = array();
 
 			if (isset($_SESSION['correctletters']))
 			{
-				$cletters = $_SESSION['correctletters'];
+				$this->cletters = $_SESSION['correctletters'];
 			}
 
 			switch ($this->getAction())
 			{				
 				case 'new_game':
 					
-					$this->correct = $this->ranWord();
-					$this->pic = $this->basePicture();
-							
+					$this->correct = $this->ranWord();					
+
 					break;
 
 				case 'guess':
 
-					$gletter = $_GET['letter'];
-					$isletter = $this->findingLetters($gletter, $_SESSION['word']);	
+					$this->word = $_SESSION['word'];
+					$this->gletter = $_GET['letter'];
+					$this->isletter = $this->findingLetters($this->gletter, $this->word);	
 					$this->list = $_SESSION['unUsedLetters'];					
-					$this->pic = $this->picture($isletter);
-					$this->correct = $this->displayLetters($gletter, $_SESSION['word'],$cletters);
 																								
 					break;
 
 				default:
+
 					if (!isset($_SESSION['word']))
 					{
 						$this->ranWord();
-					}	
+					}
+					
 			}
 			
 			if (isset($_SESSION['correctletters']))
 			{
-				$cletters = $_SESSION['correctletters'];
+				$this->cletters = $_SESSION['correctletters'];
 			}
 
-			$this->wlgame = $this->checkWinOrLoss($cletters , $_SESSION['word']);
-			$this->hidew = $this->hideWords($cletters , $_SESSION['word']);
-
+			$this->wlgame = $this->checkWinOrLoss($this->cletters , $this->word);
 		}
 
 
 		/*
-			Accessors to grab the variables needed to 
+			Accessors that grab the variables needed to 
 			run the Hangman game.
 
 			return all field variables.
 		*/
-		public function getCorrect()
+		public function getGLetter()
 		{
-			return $this->correct;
-		}
-
-		public function getPic()
-		{
-			return $this->pic;
+			return $this->gletter;
 		}
 
 		public function getList()
@@ -92,14 +87,9 @@
 			return $this->list;
 		}
 
-		public function getWLGame()
-		{
-			return $this->wlgame;
-		}
-
-		public function getHideW()
-		{
-			return $this->hidew;
+		public function getWord() 
+		{			
+			return $this->word;
 		}
 
 		public function getAction()
@@ -107,27 +97,51 @@
 			return $this->action;
 		}
 
+		public function getCLetters() 
+		{ 
+			return $this->cletters;
+		}
+
+		public function getIsLetter()
+		{
+			return $this->isletter;
+		}
+
+		public function getWLGame() 
+		{
+			return $this->wlgame;
+		}
+
+		public function getCount()
+		{
+			return $this->count;
+		}
+
 		/*
 		This function grabs a new random word and resets
-		the SESSION variables back to default.
+		the SESSION variables and field variables 
+		back to default settings.
 		
 		return $tempArray which holds an array of '_'.			
 		*/
 		private function ranWord()
 		{	
 			$tempArray = array();
-			$maxAttempts = 6;
+			$maxAttempts = 0;
 			$_SESSION['attempts'] = ($maxAttempts);
+			$this->count = $_SESSION['attempts'];
 			$_SESSION['count'] = 0;
 			$_SESSION['c'] = 0;
+			$this->cletters = array();
 			unset($_SESSION['correctletters']);
-			unset($_SESSION['unUsedLetters']);
+			unset($_SESSION['unUsedLetters']);			
 	
 			$myfile = file_get_contents(PHPWS_SOURCE_DIR . 'mod/hangman/hangwords.txt');
 			
 			$words = preg_split('/[\s]+/', $myfile);
 			$random = rand(0,count($words));
 			$_SESSION['word'] = (strtolower($words[$random]));
+			$this->word = $_SESSION['word'];
 
 			$answer = str_split($_SESSION['word']);
 			for ($i = 0; $i < count($answer); $i++)
@@ -139,85 +153,8 @@
 		}
 
 		/*
-		This function sets the picture to 0.
-		
-		return $basepicture holds the first index
-		position for the first picture.	
-		*/
-		private function basePicture()
-		{
-			$pic = glob('mod/hangman/img/' . "*.gif");
-			$basepicture[] = array('PICTURE' => "<img src= $pic[0] />");
-			return $basepicture;
-		}
-
-		/*
-		This function determines which picture to
-		choose from if the user guesses wrong.
-
-		return $picturearray which holds the current
-		hangman picture.
-		*/
-		private function picture($isletter)
-		{
-			$pic = glob('mod/hangman/img/' . "*.gif");
-
-			if (!$isletter)
-			{
-				$_SESSION['c'] = $_SESSION['c'] + 1;
-				$c = $_SESSION['c'];
-
-				if ($c < 7)
-				{
-					$picturearray[] = array('PICTURE' => "<img src= $pic[$c] />");
-				}
-				else
-				{
-					$picturearray[] = array('PICTURE' => "<img src= $pic[6] />");
-				}					
-			}
-			else
-			{
-				$p = $_SESSION['c'];
-				$picturearray[] = array('PICTURE' => "<img src= $pic[$p] />");
-			}
-
-			return $picturearray;
-		}
-
-		/*
-		This function displays the letters on the screen
-		for the users to choose from.
-
-		return $correctarray that holds an array
-		of letters or symbols.
-		*/	
-		private function displayLetters($gletter, $word, $cletters)
-		{
-			$answer = str_split($word);
-			$correctarray = array();
-
-			for ($i = 0; $i < count($answer); $i++)
-			{
-				if ($gletter == $answer[$i])
-				{
-					$correctarray[] = array('CORRECTLETTERS' => $gletter);
-				}
-				elseif (in_array($answer[$i], $cletters))
-				{
-					$correctarray[] = array('CORRECTLETTERS' => $answer[$i]);
-				}				
-				else
-				{
-					$correctarray[] = array('CORRECTLETTERS' => "_ ");					
-				}
-			}
-			return $correctarray;
-		}
-
-		/*
 		This function grabs the guess and the word, 
-		splits the word and then compares the guess
+		splits the word, and then compares the guess
 		to each character.
 
 		return $inWord that holds a boolean value.
@@ -244,9 +181,10 @@
 			
 			if ($inWord == false)
 			{
-				$_SESSION['attempts'] = $_SESSION['attempts'] - 1;
+				$_SESSION['attempts'] = $_SESSION['attempts'] + 1;
 			}
 			
+			$this->count = $_SESSION['attempts'];
 
 			if (!isset($_SESSION['unUsedLetters']))
 			{
@@ -270,6 +208,35 @@
 		}
 
 		/*
+			listLetters displays a list of used or
+			unused letters for the user to click on.
+
+			return $list that holds a list of letters.
+		*/
+		public function listLetters()
+		{
+			$l = array();
+
+			if($this->action === 'new_game')
+			{
+				$l = range('a','z');
+			}
+			else
+			{
+				$l = $this->list;
+			}
+
+
+			foreach ($l as $value)
+			{
+				$link = PHPWS_Text::moduleLink($value,'hangman', array('action'=> 'guess', 'letter'=>$value));
+				$list[] = array('LETTER' => $link);
+			}	
+
+			return $list;
+		}
+
+		/*
 		This function compares the guess
 		and the word to determine if the player wins 
 		or lose and displays the correct response.
@@ -280,7 +247,7 @@
 		private function checkWinOrLoss($correctarray,$word)
 		{
 			$phrase = '<font color="red">';
-			if ($_SESSION['attempts'] == 0)
+			if ($_SESSION['attempts'] == 6)
 			{				 
 				$winlosearray[]= array('WIN_LOSS' => "You $phrase lost</font>! <br> The word was $word.");	
 				return $winlosearray;
@@ -292,28 +259,5 @@
 				return $winlosearray;						
 			}		
 		}
-		
-		/*
-		This function hides the letters if the player
-		wins or loses the game.
-
-		return true or false if the player wins or loses
-		the game.
-		*/
-		private function hideWords($correctarray,$word)
-		{
-			if ($_SESSION['attempts'] == 0)
-			{
-				return true;
-			}
-			
-			if (count($correctarray) == count(str_split($word)))
-			{
-				return true;
-			}
-
-			return false;
-		}
 	}
-
 ?>
